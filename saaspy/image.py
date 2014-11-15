@@ -27,6 +27,7 @@ class image(object):
         fov: the field of view of the Region of Interest
         calibrated_center: the calibrated center of the SAAS [x, y]
         max_index: the index of the maximum pixel
+        exposure: exposure time in seconds
         """
         f = fits.open(filename)
         self.data = f[1].data
@@ -37,6 +38,9 @@ class image(object):
         self.roi = None
         self.roi_reset()
         self.calibrated_center = np.array([659, 483])
+        self.exposure = self.header.get('EXPTIME')
+        self.gain_preamp = self.header.get('GAIN_PRE')
+        self.gain_analog = self.header.get('GAIN_ANA')
 
     def imshow(self):
         """
