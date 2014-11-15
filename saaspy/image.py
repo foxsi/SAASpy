@@ -7,6 +7,9 @@ from skimage import filter
 from skimage.transform import hough_circle
 from skimage.feature import peak_local_max
 from skimage.draw import circle_perimeter
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 
 class image(object):
