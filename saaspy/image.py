@@ -31,6 +31,7 @@ class image(object):
         exposure: exposure time in seconds
         date: datetime object when image was taken
         """
+        self.filename = filename
         try:
             f = fits.open(filename)
         except Exception:
