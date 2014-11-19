@@ -15,6 +15,7 @@ class collection(object):
         minval = []
         maxindex_x = []
         maxindex_y = []
+        std = []
 
         for i, f in enumerate(file_list):
             s = image(f)
@@ -24,8 +25,9 @@ class collection(object):
             minval.append(s.min)
             maxindex_x.append(s.max_index[0])
             maxindex_y.append(s.max_index[1])
+            std.append((s.std))
 
-        data = {'max': maxval, 'min': minval, 'mindex_x': maxindex_x, 'mindex_y': maxindex_y}
+        data = {'max': maxval, 'min': minval, 'mindex_x': maxindex_x, 'mindex_y': maxindex_y, 'std': std}
         self.data = DataFrame(data, index=times)
 
 
