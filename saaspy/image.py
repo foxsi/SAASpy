@@ -10,6 +10,7 @@ from skimage.draw import circle_perimeter
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from datetime import datetime
 
 
 class image(object):
@@ -28,25 +29,37 @@ class image(object):
         calibrated_center: the calibrated center of the SAAS [x, y]
         max_index: the index of the maximum pixel
         exposure: exposure time in seconds
+        date: datetime object when image was taken
         """
-        f = fits.open(filename)
-        self.data = f[1].data
-        self.data = self.data.astype(np.ubyte)
-        self.header = f[0].header
-        self.max_index = np.unravel_index(self.data.argmax(), np.shape(self.data))
-        self.fov = np.array([100, 100])
-        self.roi = None
-        self.roi_reset()
-        self.calibrated_center = np.array([659, 483])
-        self.exposure = self.header.get('EXPTIME')
-        self.gain_preamp = self.header.get('GAIN_PRE')
-        self.gain_analog = self.header.get('GAIN_ANA')
+        try:
+            f = fits.open(filename)
+        except Exception:
+            print("Warning. Can't open file %f" % filename)
+            f = None
+
+        if f is not None:
+            self.data = f[1].data
+            self.data = self.data.astype(np.ubyte)
+            self.header = f[0].header
+            self.max_index = np.unravel_index(self.data.argmax(), np.shape(self.data))
+            self.fov = np.array([100, 100])
+            self.roi = None
+            # Set the default roi as the entire image
+            self.roi_reset()
+            self.calibrated_center = np.array([659, 483])
+            self.exposure = self.header.get('EXPTIME')
+            self.gain_preamp = self.header.get('GAIN_PRE')
+            self.gain_analog = self.header.get('GAIN_ANA')
+            self.date = datetime.strptime(self.header.get("DATE_OBS"), "%c")
+            self.max = np.max(self.data)
+            self.min = np.min(self.data)
+            self.std = np.std(self.data)
 
     def imshow(self):
         """
         Plot the image.
         """
-        ax = plt.imshow(self.data, origin='upper', cmap=cm.Greys_r, vmin=0, vmax=255)
+        ax = plt.imshow(self.roi_data, origin='upper', cmap=cm.Greys_r, vmin=0, vmax=255)
         plt.title('FOXSI SAAS ' + self.header['DATE_OBS'])
         ax.set_interpolation('nearest')
 
@@ -115,7 +128,7 @@ def find_center(saas_image, sigma=0.8, num_circles=5):
     Returns:
 
     """
-    edges = filter.canny(self.roi_data, sigma=sigma)
+    edges = filter.canny(saas_image.roi_data, sigma=sigma)
     hough_radii = np.arange(10, 70, 1)
     hough_res = hough_circle(edges, hough_radii)
     centers = []
