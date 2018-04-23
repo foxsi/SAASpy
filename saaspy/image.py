@@ -3,7 +3,7 @@ __author__ = 'Steven Christe'
 
 from astropy.io import fits
 
-from skimage import filter
+from skimage import feature
 from skimage.transform import hough_circle
 from skimage.feature import peak_local_max
 from skimage.draw import circle_perimeter
@@ -129,7 +129,7 @@ def find_center(saas_image, sigma=0.8, num_circles=5):
     Returns:
 
     """
-    edges = filter.canny(saas_image.roi_data, sigma=sigma)
+    edges = feature.canny(saas_image.roi_data, sigma=sigma)
     hough_radii = np.arange(10, 70, 1)
     hough_res = hough_circle(edges, hough_radii)
     centers = []
